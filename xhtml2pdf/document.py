@@ -173,7 +173,13 @@ def pisaDocument(src, dest=None, path=None, link_callback=None, debug=0,
         dest = pisaTempFile(capacity=context.capacity)
     context.dest = dest
 
-    data = out.getvalue() # TODO: That load all the tempfile in RAM - Why bother with a swapping tempfile then?
-    context.dest.write(data) # TODO: context.dest is a tempfile as well...
+    if out.strategy != 0:
+        ## If tempfile in disk, not load all the tempfile in RAM (because in my vps, memory is limited)
+        g = out.xgetvalue()
+        for line in g:
+            context.dest.write(line)
+    else:
+        data = out.getvalue() # TODO: That load all the tempfile in RAM - Why bother with a swapping tempfile then?
+        context.dest.write(data) # TODO: context.dest is a tempfile as well...
 
     return context

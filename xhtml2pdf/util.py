@@ -469,6 +469,17 @@ class pisaTempFile(object):
         self._delegate.seek(0)
         return self._delegate.read()
 
+    def xgetvalue(self):
+        """Get value of file, it`s a generator, fast and save memory"""
+        if self.strategy == 0:
+            ## if the first strategy, which use StringIO, in memory already, 
+            ## so just return the data
+            yield self._delegate.getvalue()
+        self._delegate.flush()
+        self._delegate.seek(0)
+        for line in self._delegate:
+            yield line
+
     def write(self, value):
         " If capacity != -1 and length of file > capacity it is time to switch "
         if self.capacity > 0 and self.strategy == 0:
